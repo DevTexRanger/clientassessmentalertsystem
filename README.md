@@ -158,7 +158,7 @@ Open Task Scheduler
 - Trigger: Weekly on Mondays
 - Time: e.g., 8:00 AM
 
-3. Action: Start a program
+3. Action: Start a program (ensure Administrator privileges are enabled)
 - Program:
 ```text
 "C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE"
