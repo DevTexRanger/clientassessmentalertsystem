@@ -26,6 +26,7 @@ Internal use only — adapt freely for clinics, case management, and mental heal
 | `Due Soon?`          | Formula      | TRUE if due in next 14 days                         |
 
 ### Supported Assessment Types & Intervals (sheet AssessmentType)
+If these change, please feel free to edit them in the `ClientAssessmentSchedule.xlsm` workbook. 
 
 | Assessment Type              | Interval |
 |-----------------------------|----------|
