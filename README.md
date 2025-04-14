@@ -2,6 +2,8 @@
 
 This project automates client assessment email alerts using Excel VBA and Outlook. It checks if any assessments are due within 14 days and sends reminder emails to assigned caseworkers.
 
+Internal use only — adapt freely for clinics, case management, and mental health agencies.
+
 ---
 
 ## Project Files
