@@ -148,32 +148,22 @@ Save. This would be a good time to ensure that you are saving your work as an `E
 
 1. Prerequisites
 - Save the workbook as `ClientAssessmentSchedule.xlsm`
-
 - Macro must be enabled
-
 - Outlook must be installed and configured
 
 2. Create Task
 Open Task Scheduler
-
 - Create a new basic task:
-
 - Name: Weekly Email Assessment Alert
-
 - Trigger: Weekly on Mondays
-
 - Time: e.g., 8:00 AM
 
 3. Action: Start a program
-
 - Program:
-
 ```text
 "C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE"
 ```
-
 - Arguments:
-
 ```text
 "C:\Path\To\ClientAssessmentSchedule.xlsm"
 ```
