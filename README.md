@@ -6,12 +6,12 @@ This project automates client assessment email alerts using Excel VBA and Outloo
 
 ## Project Files
 
-- `ClientAssessmentSchedule.xlsm`: Main Excel file with client data and embedded macro
+- `ClientAssessmentSchedule.xlsm`: Main Excel file with client data and embedded macro (consists of 5 sheets: AssessmentTypes (for use with data validation), Sheet1-Sheet4 (denoting each of the 4 case workers))
 - Optional: `RunAssessmentAlerts.vbs` (if you want to launch silently via Task Scheduler)
 
 ---
 
-## Excel Sheet Layout
+## Excel Sheet Layout (Sheets1-Sheets4)
 
 | Column               | Type         | Description                                         |
 |----------------------|--------------|-----------------------------------------------------|
@@ -23,7 +23,7 @@ This project automates client assessment email alerts using Excel VBA and Outloo
 | `Next Due Date`      | Formula      | Automatically calculated from type + interval      |
 | `Due Soon?`          | Formula      | TRUE if due in next 14 days                         |
 
-### Supported Assessment Types & Intervals
+### Supported Assessment Types & Intervals (sheet AssessmentType)
 
 | Assessment Type              | Interval |
 |-----------------------------|----------|
@@ -42,15 +42,19 @@ This project automates client assessment email alerts using Excel VBA and Outloo
  IF(D2="Psychosocial", E2+365,
  IF(D2="MI State Report", E2+365, "")))))
 ```
+Copy the formula down as necessary.
 
 ### Example Formula for `Due Soon?`:
 
 ```excel
 =AND(F2-TODAY()<=14, F2-TODAY()>=0)
 ```
+Copy the formula down as necessary.
 
 ## VBA Macro Code
 `SendDueAssessmentAlerts` (Module)
+
+In the VBA editor (`ALT + F11`) or go to Developer Mode in Excel (File -> Options -> Customize Ribbon (right hand column, check box for Developer). Once this is done, in the VBA editor, click Insert → Module. 
 
 ```vba
 Sub SendDueAssessmentAlerts()
@@ -59,7 +63,11 @@ Sub SendDueAssessmentAlerts()
     Dim ws As Worksheet
     Dim lastRow As Long
     Dim i As Long
+    Dim alertBody As String
+    Dim caseworkerEmail As String
+    Dim sheetName As String
 
+    ' Start Outlook
     On Error Resume Next
     Set OutlookApp = GetObject(, "Outlook.Application")
     If OutlookApp Is Nothing Then
@@ -72,27 +80,61 @@ Sub SendDueAssessmentAlerts()
         Exit Sub
     End If
 
-    Set ws = ThisWorkbook.Sheets("Sheet 1") ' Change to your actual sheet name
-    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    ' Loop through each caseworker sheet
+    For Each ws In ThisWorkbook.Sheets
+        sheetName = ws.Name
 
-    For i = 2 To lastRow
-        If ws.Cells(i, "G").Value = True Then ' Column G = “Due Soon?”
+        ' Map sheet names to email addresses
+        Select Case sheetName
+            Case "Alice"
+                caseworkerEmail = "alice@example.com" ' Replace with the actual email address
+            Case "Bob"
+                caseworkerEmail = "bob@example.com" ' Replace with the actual email address
+            Case "Carlos"
+                caseworkerEmail = "carlos@example.com" ' Replace with the actual email address
+            Case "Diana"
+                caseworkerEmail = "diana@example.com"  ' Replace with the actual email address
+            Case Else
+                GoTo NextSheet ' Skip unknown sheets
+        End Select
+
+        lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+        alertBody = ""
+
+        ' Build the body of the email
+        For i = 2 To lastRow
+            If ws.Cells(i, "G").Value = True Then ' Column G = “Due Soon?”
+                alertBody = alertBody & _
+                    "• " & ws.Cells(i, "A").Value & " — Due: " & _
+                    Format(ws.Cells(i, "F").Value, "mmm dd, yyyy") & vbCrLf
+            End If
+        Next i
+
+        ' If there are any alerts, send email
+        If alertBody <> "" Then
             Set OutlookMail = OutlookApp.CreateItem(0)
             With OutlookMail
-                .To = "caseworker@example.com" ' Update as needed
-                .Subject = "Assessment Due for " & ws.Cells(i, "A").Value
-                .Body = "Reminder: An assessment is due for " & ws.Cells(i, "A").Value & _
-                        " on " & ws.Cells(i, "F").Value & ". Please follow up."
+                .To = caseworkerEmail
+                .Subject = "Upcoming Assessments Due (" & sheetName & ")"
+                .Body = "Hello " & sheetName & "," & vbCrLf & vbCrLf & _
+                        "The following client assessments are due soon:" & vbCrLf & vbCrLf & _
+                        alertBody & vbCrLf & "Please follow up accordingly." & vbCrLf & vbCrLf & _
+                        "- Automated Alert System"
                 .Send
             End With
         End If
-    Next i
 
-    MsgBox "Emails sent!", vbInformation
+NextSheet:
+    Next ws
+
+    MsgBox "Emails sent to all caseworkers.", vbInformation
 End Sub
 ```
 
+
 ### `Workbook_Open()` (Inside `ThisWorkbook`)
+
+While in the VBA editor, on the left hand side find `ThisWorkbook` and double-click it and add the following code:
 
 ```vba
 Private Sub Workbook_Open()
@@ -100,10 +142,12 @@ Private Sub Workbook_Open()
 End Sub
 ```
 
+Save. This would be a good time to ensure that you are saving your work as an `Excel Macro-Enabled Workbook (*.xlsm)`. 
+
 ## Automate via Windows Task Scheduler
 
 1. Prerequisites
-- Save the workbook as ClientAssessmentSchedule.xlsm
+- Save the workbook as `ClientAssessmentSchedule.xlsm`
 
 - Macro must be enabled
 
