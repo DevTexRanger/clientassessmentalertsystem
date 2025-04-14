@@ -7,7 +7,7 @@ This project automates client assessment email alerts using Excel VBA and Outloo
 ## Project Files
 
 - `ClientAssessmentSchedule.xlsm`: Main Excel file with client data and embedded macro (consists of 5 sheets: AssessmentTypes (for use with data validation), Sheet1-Sheet4 (denoting each of the 4 case workers))
-- Optional: `RunAssessmentAlerts.vbs` (if you want to launch silently via Task Scheduler)
+- Optional: `RunAssessmentAlerts.vbs` (if you want to launch silently via Task Scheduler--Still testing)
 
 ---
 
